@@ -8,6 +8,10 @@ import com.sv.videosplit.Arguments;
 import com.sv.videosplit.BaseProcessor;
 
 import java.nio.file.Paths;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -38,11 +42,14 @@ public class CutByTime extends BaseProcessor {
                 "Parameter file is null.");
 
         String out = getOutputName(args.getFileName());
+        LocalTime startTime = LocalTime.parse(args.getStartTime());
+        LocalTime endTime = LocalTime.parse(args.getEndTime());
+
         FFmpeg.atPath(Paths.get(FFMPEG_PATH))
                 .addInput(UrlInput.fromUrl(args.getFileName())
                         //.setPosition(0, TimeUnit.HOURS) // Start time
-                        .setPosition(0, TimeUnit.HOURS) // Start time
-                        .setDuration(1, TimeUnit.HOURS)) // Duration of the clip
+                        .setPosition(startTime.toSecondOfDay(), TimeUnit.SECONDS) // Start time
+                        .setDuration(endTime.toSecondOfDay(), TimeUnit.SECONDS)) // Duration of the clip
                 .addOutput(UrlOutput.toPath(Paths.get(out))
                         //.setVideoCodec("copy") // Sets -c:v copy
                         //.setAudioCodec("copy") // Sets -c:a copy
